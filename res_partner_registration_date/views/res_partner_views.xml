@@ -1,0 +1,42 @@
+<odoo>
+    <!-- Vista Tree/List -->
+    <record id="view_res_partner_tree_inherit_registration_date" model="ir.ui.view">
+        <field name="name">res.partner.tree.inherit.registration.date</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="complete_name" position="after">
+                <field name="registration_date" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vista Search -->
+    <record id="view_res_partner_search_inherit_registration_date" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit.registration.date</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="registration_date"/>
+                <filter string="Registration Date" name="registration_date" context="{'group_by': 'registration_date'}"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vista Form -->
+    <record id="view_res_partner_form_inherit_registration_date" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.registration.date</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page name="partner_info" string="Partner Info">
+                    <group>
+                        <field name="registration_date"/>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>
