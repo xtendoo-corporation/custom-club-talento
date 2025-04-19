@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
             <field name="complete_name" position="after">
                 <field name="registration_date" optional="show"/>
+                <field name="membership_plan"/>
             </field>
         </field>
     </record>
@@ -19,8 +20,12 @@
         <field name="arch" type="xml">
             <field name="name" position="after">
                 <field name="registration_date"/>
-                <filter string="Registration Date" name="registration_date" context="{'group_by': 'registration_date'}"/>
+                <field name="membership_plan"/>
             </field>
+            <filter name="group_country" position="after">
+                <filter string="Registration Date" name="registration_date" context="{'group_by': 'registration_date'}"/>
+                <filter string="Membership Plan" name="membership_plan" context="{'group_by': 'membership_plan'}"/>
+            </filter>
         </field>
     </record>
 
@@ -34,6 +39,7 @@
                 <page name="partner_info" string="Partner Info">
                     <group>
                         <field name="registration_date"/>
+                        <field name="membership_plan"/>
                     </group>
                 </page>
             </notebook>

@@ -37,3 +37,21 @@ msgstr "Fecha en la que se dio de alta este socio."
 #: model_terms:ir.ui.view,arch_db:res_partner_registration_date.view_res_partner_form_inherit_registration_date
 msgid "Partner Info"
 msgstr "Socio"
+
+#. module: res_partner_registration_date
+#: model:ir.model.fields,field_description:res_partner_registration_date.field_res_partner__membership_plan
+#: model:ir.model.fields,field_description:res_partner_registration_date.field_res_users__membership_plan
+msgid "Membership Plan"
+msgstr "Plan de Membresía"
+
+#. module: res_partner_registration_date
+#: model:ir.model.fields.selection,name:res_partner_registration_date.selection__res_partner__membership_plan__annual
+#: model:ir.model.fields.selection,name:res_partner_registration_date.selection__res_users__membership_plan__annual
+msgid "Annual"
+msgstr "Anual"
+
+#. module: res_partner_registration_date
+#: model:ir.model.fields.selection,name:res_partner_registration_date.selection__res_partner__membership_plan__biannual
+#: model:ir.model.fields.selection,name:res_partner_registration_date.selection__res_users__membership_plan__biannual
+msgid "Biannual"
+msgstr "Semestral"

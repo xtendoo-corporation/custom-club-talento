@@ -8,3 +8,10 @@ class ResPartner(models.Model):
         default=fields.Date.context_today,
         help="Date when this partner was registered."
     )
+    membership_plan = fields.Selection([
+        ('annual', 'Annual'),
+        ('biannual', 'Biannual')
+    ],
+        string="Membership Plan",
+        help="Type of membership plan",
+    )
