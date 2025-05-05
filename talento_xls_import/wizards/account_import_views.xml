@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_partner_import_wizard_form" model="ir.ui.view">
+        <field name="name">talento.account.import.wizard.form</field>
+        <field name="model">talento.account.import.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Importar datos">
+                <group>
+                    <field name="excel_file" filename="excel_file_name"/>
+                    <field name="excel_file_name" invisible="1"/>
+                    <field name="journal_id"/>
+                </group>
+                <footer>
+                    <button name="action_import" string="Importar" type="object" class="btn-primary" data-hotkey="q"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción para abrir el wizard -->
+    <record id="action_partner_import_wizard" model="ir.actions.act_window">
+        <field name="name">Importar Contactos y Asientos</field>
+        <field name="res_model">talento.account.import.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">list</field>
+    </record>
+
+    <!-- Menú para acceder al wizard -->
+    <menuitem id="menu_partner_import_wizard"
+          name="Importar Contactos y Asientos"
+          parent="contacts.menu_contacts"
+          action="action_partner_import_wizard"
+          sequence="100"/>
+
+</odoo>
