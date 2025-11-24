@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Club Talento Account Import</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #7C4DFF;
+            border-bottom: 3px solid #7C4DFF;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #5E35B1;
+            margin-top: 30px;
+        }
+        .feature {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #7C4DFF;
+        }
+        .warning {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .screenshot {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <h1>🧾 Club Talento Account Import</h1>
+
+    <p>
+        <strong>Módulo de importación de asientos contables desde Excel para Odoo 18</strong>
+    </p>
+
+    <div class="feature">
+        <h2>✨ Características principales</h2>
+        <ul>
+            <li>Importación masiva desde archivos Excel (.xlsx)</li>
+            <li>Soporte para múltiples años (2023, 2024, 2025)</li>
+            <li>Normalización automática de cuentas contables a 6 dígitos</li>
+            <li>Creación automática de cuentas y contactos</li>
+            <li>Detección y enlace de cuentas de terceros (400, 410, 430)</li>
+            <li>Validación de balance automática</li>
+            <li>Publicación opcional de asientos que cuadren</li>
+            <li>Auditoría completa en chatter</li>
+            <li>Resumen detallado de la importación</li>
+        </ul>
+    </div>
+
+    <h2>📋 Formato del archivo Excel</h2>
+
+    <p>
+        El archivo debe contener tres hojas: <code>2023</code>, <code>2024</code>, <code>2025</code>
+    </p>
+
+    <p>Cada hoja debe tener las siguientes columnas:</p>
+
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr style="background: #7C4DFF; color: white;">
+                <th>Columna</th>
+                <th>Descripción</th>
+                <th>Ejemplo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Fecha</strong></td>
+                <td>Fecha de la línea</td>
+                <td>01-Oct.</td>
+            </tr>
+            <tr>
+                <td><strong>Asto.</strong></td>
+                <td>Número de asiento</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td><strong>Cuenta</strong></td>
+                <td>Código de cuenta</td>
+                <td>410.001</td>
+            </tr>
+            <tr>
+                <td><strong>Título</strong></td>
+                <td>Descripción / Nombre del contacto</td>
+                <td>ACME SL</td>
+            </tr>
+            <tr>
+                <td><strong>Concepto</strong></td>
+                <td>Descripción de la línea</td>
+                <td>Factura 123</td>
+            </tr>
+            <tr>
+                <td><strong>Debe</strong></td>
+                <td>Importe debe</td>
+                <td>1000.00</td>
+            </tr>
+            <tr>
+                <td><strong>Haber</strong></td>
+                <td>Importe haber</td>
+                <td>0.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>🔧 Reglas de normalización</h2>
+
+    <div class="feature">
+        <h3>Cuentas largas (&gt;= 6 dígitos)</h3>
+        <p>Se toman los 3 primeros + los 3 últimos dígitos</p>
+        <ul>
+            <li>40000001 → <strong>400000</strong></li>
+            <li>62100001 → <strong>621001</strong></li>
+        </ul>
+    </div>
+
+    <div class="feature">
+        <h3>Cuentas cortas (&lt; 6 dígitos)</h3>
+        <ul>
+            <li>410 → <strong>410000</strong></li>
+            <li>4101 → <strong>410100</strong></li>
+        </ul>
+    </div>
+
+    <div class="warning">
+        <h3>⚠️ Regla especial: Cuentas de terceros</h3>
+        <p>Las cuentas que empiezan por 400, 410 o 430 se normalizan a:</p>
+        <ul>
+            <li>400xxx → <strong>400000</strong> (Proveedores)</li>
+            <li>410xxx → <strong>410000</strong> (Acreedores)</li>
+            <li>430xxx → <strong>430000</strong> (Clientes)</li>
+        </ul>
+    </div>
+
+    <h2>👥 Contactos (Partners)</h2>
+
+    <p>
+        Si la cuenta normalizada es <code>400000</code>, <code>410000</code> o <code>430000</code>,
+        la línea debe tener un contacto asociado.
+    </p>
+
+    <ul>
+        <li>El nombre del contacto se toma de la columna <strong>Título</strong></li>
+        <li>Si el contacto no existe, se crea automáticamente (si la opción está activa)</li>
+        <li>El contacto se enlaza en la línea del asiento</li>
+    </ul>
+
+    <h2>✅ Validación de balance</h2>
+
+    <p>
+        Cada asiento se valida para verificar que el balance sea cero (debe = haber).
+    </p>
+
+    <ul>
+        <li>Si cuadra y la opción está activa → se publica automáticamente ✓</li>
+        <li>Si NO cuadra → se deja en borrador y se registra un mensaje ⚠️</li>
+    </ul>
+
+    <h2>📊 Uso</h2>
+
+    <ol style="list-style-type: decimal; padding-left: 20px;">
+        <li style="margin: 10px 0;">
+            Ir a <strong>Contabilidad > Importaciones > Importar Diario Club Talento</strong>
+        </li>
+        <li style="margin: 10px 0;">
+            Subir el archivo Excel
+        </li>
+        <li style="margin: 10px 0;">
+            Configurar las opciones:
+            <ul>
+                <li>Compañía</li>
+                <li>Diario destino</li>
+                <li>Crear cuentas automáticamente</li>
+                <li>Crear contactos automáticamente</li>
+                <li>Publicar asientos que cuadren</li>
+            </ul>
+        </li>
+        <li style="margin: 10px 0;">
+            Hacer clic en <strong>Importar</strong>
+        </li>
+        <li style="margin: 10px 0;">
+            Revisar el resumen y los asientos creados
+        </li>
+    </ol>
+
+    <h2>🧪 Tests</h2>
+
+    <p>El módulo incluye una batería completa de tests:</p>
+
+    <ul>
+        <li>Tests de normalización de cuentas</li>
+        <li>Tests de inferencia de tipo de cuenta</li>
+        <li>Tests de importación de asientos balanceados</li>
+        <li>Tests de importación de asientos desbalanceados</li>
+        <li>Tests de creación de partners</li>
+        <li>Tests de creación de cuentas</li>
+        <li>Tests de múltiples años</li>
+    </ul>
+
+    <h2>👨‍💻 Autor</h2>
+
+    <p>
+        <strong>Xtendoo</strong><br>
+        <a href="https://github.com/xtendoo-corporation/custom-club-talento">
+            https://github.com/xtendoo-corporation/custom-club-talento
+        </a>
+    </p>
+
+    <h2>📄 Licencia</h2>
+
+    <p>AGPL-3</p>
+
+</body>
+</html>
+

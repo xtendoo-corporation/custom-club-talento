@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menú en Facturación > Clientes -->
+    <menuitem id="menu_club_talento_import"
+              name="Importar Asientos desde Excel"
+              parent="account.menu_finance_payables"
+              action="action_club_talento_import_wizard"
+              groups="account.group_account_user"
+              sequence="23"/>
+
+</odoo>
+

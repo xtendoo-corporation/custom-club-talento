@@ -1,0 +1,133 @@
+# Translation template for club_talento_account_import
+# Copyright (C) 2025 Xtendoo
+# This file is distributed under the same license as the club_talento_account_import package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: club_talento_account_import 18.0.1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-30 12:00+0000\n"
+"PO-Revision-Date: 2025-01-30 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__company_id
+msgid "Compañía"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__create_accounts
+msgid "Crear cuentas si no existen"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,help:club_talento_account_import.field_club_talento_import_wizard__create_accounts
+msgid "Si está marcado, crea automáticamente las cuentas que no existan"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__create_partners
+msgid "Crear contactos si no existen"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,help:club_talento_account_import.field_club_talento_import_wizard__create_partners
+msgid "Si está marcado, crea automáticamente los contactos que no existan"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__post_balanced
+msgid "Publicar asientos que cuadren"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,help:club_talento_account_import.field_club_talento_import_wizard__post_balanced
+msgid "Publica automáticamente los asientos cuyo balance sea cero"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__file_data
+msgid "Archivo Excel"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,help:club_talento_account_import.field_club_talento_import_wizard__file_data
+msgid "Archivo .xlsx con hojas 2023, 2024, 2025"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__journal_id
+msgid "Diario"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,help:club_talento_account_import.field_club_talento_import_wizard__journal_id
+msgid "Diario donde se crearán los asientos"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,field_description:club_talento_account_import.field_club_talento_import_wizard__result_text
+msgid "Resultado"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.model.fields,help:club_talento_account_import.field_club_talento_import_wizard__result_text
+msgid "Resumen de la importación"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.actions.act_window,name:club_talento_account_import.action_club_talento_import_wizard
+#: model:ir.ui.menu,name:club_talento_account_import.menu_club_talento_import
+msgid "Importar Diario Club Talento"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.ui.view,arch_db:club_talento_account_import.view_club_talento_import_wizard_form
+msgid "Importar Asientos Club Talento"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.ui.view,arch_db:club_talento_account_import.view_club_talento_import_wizard_form
+msgid "Importar"
+msgstr ""
+
+#. module: club_talento_account_import
+#: model:ir.ui.view,arch_db:club_talento_account_import.view_club_talento_import_wizard_form
+msgid "Cerrar"
+msgstr ""
+
+#. module: club_talento_account_import
+#: code:addons/club_talento_account_import/wizards/club_talento_import_wizard.py:0
+#, python-format
+msgid "El módulo 'openpyxl' no está instalado. Por favor, instálelo con: pip install openpyxl"
+msgstr ""
+
+#. module: club_talento_account_import
+#: code:addons/club_talento_account_import/wizards/club_talento_import_wizard.py:0
+#, python-format
+msgid "Debe cargar un archivo Excel."
+msgstr ""
+
+#. module: club_talento_account_import
+#: code:addons/club_talento_account_import/wizards/club_talento_import_wizard.py:0
+#, python-format
+msgid "Faltan las siguientes hojas en el archivo: %s"
+msgstr ""
+
+#. module: club_talento_account_import
+#: code:addons/club_talento_account_import/wizards/club_talento_import_wizard.py:0
+#, python-format
+msgid "Asientos importados"
+msgstr ""
+
+#. module: club_talento_account_import
+#: code:addons/club_talento_account_import/wizards/club_talento_import_wizard.py:0
+#, python-format
+msgid "Faltan las siguientes cuentas y la opción 'Crear cuentas si no existen' está desactivada: %s"
+msgstr ""
+
