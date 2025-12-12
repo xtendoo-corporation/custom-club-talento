@@ -118,14 +118,6 @@ class ClubTalentoImportWizard(models.TransientModel):
         file_content = base64.b64decode(self.file_data)
         workbook = openpyxl.load_workbook(io.BytesIO(file_content), data_only=True)
 
-        # Validar hojas requeridas
-        required_sheets = ["2023", "2024", "2025"]
-        missing_sheets = [s for s in required_sheets if s not in workbook.sheetnames]
-        if missing_sheets:
-            raise UserError(_(
-                "Faltan las siguientes hojas en el archivo: %s"
-            ) % ", ".join(missing_sheets))
-
         # Estadísticas
         stats = {
             "moves_created": 0,
@@ -138,15 +130,22 @@ class ClubTalentoImportWizard(models.TransientModel):
 
         all_moves = self.env["account.move"]
 
+        # Procesar todas las hojas del archivo
+        # Si no hay hojas, usar la primera hoja activa
+        sheets_to_process = workbook.sheetnames if workbook.sheetnames else []
+
+        if not sheets_to_process:
+            raise UserError(_("El archivo Excel no contiene hojas."))
+
+        _logger.info("Hojas encontradas en el Excel: %s", ", ".join(sheets_to_process))
+
         # Procesar cada hoja
-        for sheet_name in required_sheets:
-            year = int(sheet_name)
+        for sheet_name in sheets_to_process:
             sheet = workbook[sheet_name]
+            _logger.info("Procesando hoja '%s'...", sheet_name)
 
-            _logger.info("Procesando hoja %s...", sheet_name)
-
-            # Parsear datos
-            lines_data = self._parse_sheet(sheet, year, stats)
+            # Parsear datos (el año se extrae de la fecha de cada línea)
+            lines_data = self._parse_sheet(sheet, None, stats)
 
             # Agrupar por (Año, Asto., Fecha)
             grouped = self._group_lines(lines_data)
@@ -169,9 +168,14 @@ class ClubTalentoImportWizard(models.TransientModel):
         })
         return action
 
-    def _parse_sheet(self, sheet, year, stats):
+    def _parse_sheet(self, sheet, year_param, stats):
         """
         Parsea una hoja de Excel y extrae las líneas de datos.
+
+        Args:
+            sheet: Hoja de Excel a procesar
+            year_param: Parámetro de año (puede ser None, se extrae de la fecha)
+            stats: Diccionario de estadísticas
 
         Returns:
             list: Lista de diccionarios con los datos de cada línea
@@ -182,7 +186,7 @@ class ClubTalentoImportWizard(models.TransientModel):
         header_row = None
         for idx, row in enumerate(sheet.iter_rows(min_row=1, max_row=20), start=1):
             values = [str(cell.value).strip().lower() if cell.value else "" for cell in row]
-            if "cuenta" in values and "debe" in values and "haber" in values:
+            if "cuenta" in values and ("debe" in values or "haber" in values):
                 header_row = idx
                 # Mapear columnas
                 col_map = {}
@@ -208,7 +212,7 @@ class ClubTalentoImportWizard(models.TransientModel):
                 break
 
         if not header_row:
-            stats["warnings"].append(f"No se encontró fila de encabezados en hoja {year}")
+            stats["warnings"].append(f"No se encontró fila de encabezados en la hoja")
             return lines_data
 
         # Procesar filas de datos
@@ -239,13 +243,19 @@ class ClubTalentoImportWizard(models.TransientModel):
                 titulo = str(titulo).strip() if titulo else ""
                 concepto = str(concepto).strip() if concepto else ""
 
-                # Convertir importes (manejar NaN)
+                # Convertir importes (manejar NaN y formato español con comas)
                 try:
+                    # Manejar formato español: "1.000,00" -> 1000.00
+                    if isinstance(debe, str):
+                        debe = debe.replace(".", "").replace(",", ".")
                     debe = float(debe) if debe not in (None, "", "None") else 0.0
                 except (ValueError, TypeError):
                     debe = 0.0
 
                 try:
+                    # Manejar formato español: "1.000,00" -> 1000.00
+                    if isinstance(haber, str):
+                        haber = haber.replace(".", "").replace(",", ".")
                     haber = float(haber) if haber not in (None, "", "None") else 0.0
                 except (ValueError, TypeError):
                     haber = 0.0
@@ -254,8 +264,9 @@ class ClubTalentoImportWizard(models.TransientModel):
                 if debe == 0 and haber == 0:
                     continue
 
-                # Parsear fecha
-                fecha = self._parse_date(fecha_raw, year, stats)
+                # Parsear fecha (ahora extrae el año de la fecha misma)
+                fecha = self._parse_date(fecha_raw, year_param, stats)
+                year = fecha.year if fecha else (year_param or datetime.now().year)
 
                 lines_data.append({
                     "fecha": fecha,
@@ -272,34 +283,41 @@ class ClubTalentoImportWizard(models.TransientModel):
                 _logger.warning("Error procesando fila: %s", e)
                 continue
 
-        _logger.info("Parseadas %d líneas de la hoja %s", len(lines_data), year)
+        _logger.info("Parseadas %d líneas de la hoja", len(lines_data))
         return lines_data
 
-    def _parse_date(self, fecha_raw, year, stats):
+    def _parse_date(self, fecha_raw, year_fallback, stats):
         """
-        Parsea la fecha en formato '01-Oct.' y asigna el año.
+        Parsea la fecha en diferentes formatos y extrae el año.
 
         Args:
             fecha_raw: Valor de la celda de fecha
-            year: Año de la hoja
+            year_fallback: Año por defecto si no se puede extraer
             stats: Diccionario de estadísticas
 
         Returns:
             datetime.date: Fecha parseada
         """
         if not fecha_raw:
+            year = year_fallback or datetime.now().year
             stats["warnings"].append(f"Fecha vacía, usando 01/01/{year}")
             return datetime(year, 1, 1).date()
+
+        # Si ya es datetime, retornar directamente
+        if isinstance(fecha_raw, datetime):
+            return fecha_raw.date()
 
         fecha_str = str(fecha_raw).strip()
 
         # Intentar varios formatos
         formats_to_try = [
+            ("%d/%m/%Y", None),         # 23/02/2023
+            ("%d/%m/%y", None),         # 23/02/23
+            ("%Y-%m-%d", None),         # 2023-02-23
+            ("%d-%m-%Y", None),         # 23-02-2023
+            ("%d-%m-%y", None),         # 23-02-23
             ("%d-%b.", "es_ES.UTF-8"),  # 01-Oct.
             ("%d-%b", "es_ES.UTF-8"),   # 01-Oct
-            ("%d/%m/%Y", None),         # 01/10/2023
-            ("%d/%m/%y", None),         # 01/10/23
-            ("%Y-%m-%d", None),         # 2023-10-01
         ]
 
         for fmt, loc in formats_to_try:
@@ -312,16 +330,25 @@ class ClubTalentoImportWizard(models.TransientModel):
                         pass
 
                 parsed = datetime.strptime(fecha_str, fmt)
-                # Sobrescribir año
-                return parsed.replace(year=year).date()
+
+                # Si el formato no incluye año completo y usamos %y
+                if "%y" in fmt and parsed.year < 100:
+                    # Convertir años de 2 dígitos: 23 -> 2023
+                    if parsed.year < 50:
+                        parsed = parsed.replace(year=2000 + parsed.year)
+                    else:
+                        parsed = parsed.replace(year=1900 + parsed.year)
+
+                # Si el formato es día-mes sin año, usar year_fallback
+                if fmt in ("%d-%b.", "%d-%b") and year_fallback:
+                    parsed = parsed.replace(year=year_fallback)
+
+                return parsed.date()
             except ValueError:
                 continue
 
-        # Si es datetime directamente
-        if isinstance(fecha_raw, datetime):
-            return fecha_raw.replace(year=year).date()
-
-        # Fallback: primer día del año
+        # Fallback: usar año actual o fallback
+        year = year_fallback or datetime.now().year
         stats["warnings"].append(
             f"No se pudo parsear fecha '{fecha_str}', usando 01/01/{year}"
         )

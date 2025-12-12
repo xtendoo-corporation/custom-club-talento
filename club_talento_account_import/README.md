@@ -7,7 +7,8 @@ Módulo de importación de asientos contables desde Excel para Odoo 18.0
 ## Características
 
 - ✅ Importación masiva desde archivos Excel (.xlsx)
-- ✅ Soporte para múltiples años (2023, 2024, 2025)
+- ✅ Soporte para múltiples años automático (extrae el año de las fechas)
+- ✅ Procesa todas las hojas del archivo Excel automáticamente
 - ✅ Normalización automática de cuentas contables a 6 dígitos
 - ✅ Creación automática de cuentas y contactos
 - ✅ Detección y enlace de cuentas de terceros (400, 410, 430)
@@ -37,19 +38,31 @@ pip install openpyxl
 
 ### Preparación del archivo Excel
 
-El archivo Excel debe contener tres hojas: **2023**, **2024**, **2025**
+El archivo Excel puede contener una o múltiples hojas. El módulo procesará automáticamente todas las hojas encontradas.
+
+**Formato de fecha soportado:** Las fechas deben incluir el año completo o abreviado (ej: 23/02/23 o 23/02/2023). El año se extrae automáticamente de cada fecha.
 
 Cada hoja debe tener las siguientes columnas:
 
 | Columna | Descripción | Ejemplo |
 |---------|-------------|---------|
-| Fecha | Fecha de la línea | 01-Oct. |
+| Fecha | Fecha de la línea con año | 23/02/23 |
 | Asto. | Número de asiento | 1 |
 | Cuenta | Código de cuenta | 410.001 |
 | Título | Descripción / Nombre del contacto | ACME SL |
 | Concepto | Descripción de la línea | Factura 123 |
-| Debe | Importe debe | 1000.00 |
-| Haber | Importe haber | 0.00 |
+| Debe | Importe debe | 1.000,00 |
+| Haber | Importe haber | 0,00 |
+
+**Formatos de fecha soportados:**
+- `23/02/23` - día/mes/año (2 dígitos)
+- `23/02/2023` - día/mes/año (4 dígitos)
+- `2023-02-23` - año-mes-día (ISO)
+- `23-02-2023` - día-mes-año con guiones
+
+**Formatos de importe soportados:**
+- Español: `1.000,00` (punto como separador de miles, coma como decimal)
+- Internacional: `1000.00` (punto como decimal)
 
 ### Importación
 
