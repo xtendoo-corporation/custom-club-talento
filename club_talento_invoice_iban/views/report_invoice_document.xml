@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
-        <!-- Agregar IBAN del cliente después de la tabla de líneas de factura -->
-        <xpath expr="//table[@name='invoice_line_table']" position="after">
-            <!-- Mostrar IBAN solo si el campo print_customer_iban está activo -->
-            <div class="row mt-4 mb-3" t-if="o.move_type == 'out_invoice' and o.print_customer_iban and o.partner_id.bank_ids">
-                <div class="col-12">
-                    <div class="p-3" style="background-color: #e8f4f8; border: 1px solid #bee5eb; border-radius: 4px;">
-                        <t t-set="partner_bank" t-value="o.partner_id.bank_ids[:1]"/>
-                        <t t-if="partner_bank and partner_bank.acc_number">
-                            <strong>Cuenta bancaria para domiciliación:</strong>
-                            <span class="ms-2" t-esc="partner_bank.acc_number"/>
-                        </t>
-                    </div>
-                </div>
+        <!-- Agregar IBAN del cliente en la misma línea que el total -->
+        <xpath expr="//div[@id='right-elements']" position="before">
+            <div class="col-6 d-inline-block float-start mt-5" t-if="o.move_type == 'out_invoice' and o.print_customer_iban and o.partner_id.bank_ids">
+                <t t-set="partner_bank" t-value="o.partner_id.bank_ids[:1]"/>
+                <t t-if="partner_bank and partner_bank.acc_number">
+                    <strong>Cuenta bancaria para domiciliación:</strong><br/>
+                    <span t-esc="partner_bank.acc_number"/>
+                </t>
             </div>
         </xpath>
     </template>
