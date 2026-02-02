@@ -11,4 +11,5 @@ class ResConfigSettings(models.TransientModel):
     invoice_iban_payment_method_line_ids = fields.Many2many(
         related="company_id.invoice_iban_payment_method_line_ids",
         readonly=False,
+        domain="[('company_id', '=', company_id)]",
     )
